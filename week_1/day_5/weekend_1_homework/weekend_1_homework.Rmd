@@ -1,0 +1,147 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library("dplyr")
+```
+
+
+2 MVP
+
+2.1 Base R cheatsheet
+
+See the file base_r_cheatsheet.rmd
+
+2.2 if statements and functions
+
+2.2.1 Write a function which multiples all numbers by 15 and adds 4
+
+```{r}
+multiply_number_by_15_then_add_4 <- function(x){
+  print((x * 15) + 4)
+}
+```
+
+```{r}
+multiply_number_by_15_then_add_4(1)
+multiply_number_by_15_then_add_4(2)
+multiply_number_by_15_then_add_4(3)
+```
+
+2.2.2 Write a function that returns “bird”, if the input is “goose”, “duck” or “pigeon”, and returns “not bird” for all other input
+
+```{r}
+return_bird_or_not_bird <- function(bird){
+  if(bird == "goose" | bird == "duck" | bird == "pigeon"){
+    return("bird")
+  } else {
+    return("not bird")
+  }
+}
+```
+
+```{r}
+return_bird_or_not_bird("goose")
+return_bird_or_not_bird("apple")
+return_bird_or_not_bird(5)
+return_bird_or_not_bird("seagull")
+```
+
+2.2.3 Write a function which multiplies all numbers by 10. If the input isn’t a number, the function should return “Invalid input”
+
+```{r}
+multiply_number_by_10 <- function(x){
+  if(is.numeric(x)){
+    return(x * 10)
+  } else{
+    print("Invalid input")
+  }
+}
+```
+
+```{r}
+multiply_number_by_10(2)
+multiply_number_by_10(5.3)
+multiply_number_by_10("x")
+multiply_number_by_10(7)
+```
+
+2.3 ifelse(), recode() and case_when()
+
+Library dplyr loaded at top of notebook
+
+2.3.1
+
+```{r}
+sizes <- c(13, 15, 10, 8, 22)
+
+case_when(
+  sizes > 10 ~ "Big",
+  sizes <= 10 ~ "Small"
+)
+```
+
+2.3.2
+
+```{r}
+fruit <- c("apple", "apple", "banana", "cherry", "cherry")
+
+recode(fruit, "apple" = "alpaca", "banana" = "bonobo", "cherry" = "chipmunk")
+```
+
+2.3.3
+
+```{r}
+wife_age <- c(29L, 30L, 36L, 31L, 22L)
+husband_age <- c(28L, 35L, 32L, 31L, 29L)
+
+case_when(
+  wife_age > husband_age ~ "Wife older",
+  husband_age > wife_age ~ "Husband older",
+  wife_age == husband_age ~ "Same age"
+)
+```
+
+2.4 Loops
+
+```{r}
+my_list <- list(
+  4,
+  "apple",
+  10.5,
+  c("is", "an", "apple"),
+  "apple",
+  c("i", "like", "apples"),
+  8
+)
+```
+
+2.4.1
+
+```{r}
+extract_chars_from_list <- function(item){
+  for(item in my_list){
+    if(is.character(item)){
+      print(item)
+    }
+  }
+}
+
+extract_chars_from_list(my_list)
+```
+
+2.4.2
+
+```{r}
+extract_chars_from_list_length_greater_than_1 <- function(item){
+  for(item in my_list){
+    if(is.character(item) & length(item) > 1){
+      print(paste(item, collapse = " "))
+    }
+  }
+}
+
+extract_chars_from_list_length_greater_than_1(my_list)
+```
