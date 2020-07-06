@@ -1,0 +1,102 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(readxl)
+library(openxlsx)
+library(jsonlite)
+```
+
+** MVP **
+
+Question 1
+
+```{r}
+state_income <- read_csv("data/state_income_data.csv")
+```
+
+Question 2
+
+```{r}
+state_income <- read_csv("data/state_income_data.csv", skip = 1, col_names = c("Index No", "State Name", "Name1", "Name2", "Name3", "Name4", "Name5", "Name6", "Name7", "Name8", "Name9","Name10", "Name11", "Name12"))
+state_income
+```
+
+Question 3
+
+```{r}
+cars <- read_csv("data/cars.csv")
+cars
+```
+
+```{r}
+cars <- read_csv("data/cars.csv", col_types = cols(
+    X1 = col_character(),
+    mpg = col_double(),
+    cyl = col_double(),
+    disp = col_double(),
+    hp = col_double(),
+    vs = col_logical()
+  )
+)
+cars
+```
+Question 4
+
+```{r}
+scotland <- read_delim("data/scotland.txt", delim = ";", skip = 1)
+scotland
+```
+
+Question 5
+
+read_file()
+
+Question 6
+
+```{r}
+steam <- read_csv("data/steam-200k-sample.csv", skip = 4)
+steam
+```
+
+```{r}
+steam <- read_csv("data/steam-200k-sample.csv", skip = 4, col_types = cols("bought online" = col_logical()))
+steam
+```
+
+Question 7
+
+```{r}
+payments <- read_tsv("data/historic_eu_payments.tsv")
+payments
+```
+
+Question 8
+
+?? Not sure what the question means
+
+Question 9
+
+```{r}
+analyst<- read_file("http://makemeanalyst.com/wp-content/uploads/2017/06/sample_json.txt")
+analyst
+```
+
+```{r}
+analyst1 <- prettify(analyst)
+analyst1
+```
+
+```{r}
+analyst2 <- parse_json(analyst1)
+analyst2
+```
+
+```{r}
+analyst3 <- fromJSON(analyst)
+analyst3
+```
+
