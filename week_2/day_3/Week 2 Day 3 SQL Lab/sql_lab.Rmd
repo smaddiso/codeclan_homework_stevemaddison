@@ -216,5 +216,5 @@ GROUP BY department
 Disconnect from local database
 
 ```{r}
-# dbDisconnect(db_connect)
-``
+dbDisconnect(db_connect)
+```

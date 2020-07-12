@@ -1,0 +1,185 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(RPostgreSQL)
+```
+
+Setup connection to local db
+
+```{r}
+home_location <- Sys.getenv("HOME")
+credentials_location <- paste0(home_location,"/credentials.R")
+source(credentials_location)
+```
+
+```{r}
+db_connect <- dbConnect(drv = PostgreSQL(), user = postgresql_username, password = postgresql_password, dbname = "acme_employees", host = "localhost")
+```
+
+Remove username and password from list of values for privacy
+
+```{r}
+rm(postgresql_username, postgresql_password)
+```
+
+List tables in acme_employees db
+
+```{r}
+dbListTables(conn = db_connect)
+```
+
+List fields in the teams table
+
+```{r}
+dbListFields(conn = db_connect, "teams")
+```
+
+List fields in the employees table
+
+```{r}
+dbListFields(conn = db_connect, "employees")
+```
+
+List fields in the feedbacks table
+
+```{r}
+dbListFields(conn = db_connect, "feedbacks")
+```
+
+List fields and data in teams table
+
+```{sql connection=db_connect}
+SELECT *
+FROM teams
+```
+List fields and data in employees table
+
+```{sql connection=db_connect}
+SELECT *
+FROM employees
+```
+List fields and data in feedbacks table
+
+```{sql connection=db_connect}
+SELECT *
+FROM feedbacks
+```
+** 1. MVP **
+
+1. Retrieve the records for all employees again, but this time add a field full_name containing the first_name and last_name of each employee separated by a space
+
+```{sql connection=db_connect}
+SELECT
+  *,
+  CONCAT(first_name, ' ', last_name) AS full_name
+FROM employees
+```
+2. Retrieve the details of all employees again, but this time listing their team name (as team_name), rather than their team_id
+
+```{sql connection=db_connect}
+SELECT
+  *,
+  t.name AS team_name
+FROM
+  teams AS t
+  INNER JOIN employees AS e
+  ON t.id = e.team_id
+```
+
+3. Do a breakdown of the number of employees per team (here we want two columns: team_name and num_employees). Order the table in decreasing number of employees. Include all teams, even if they have no employees
+
+```{sql connection=db_connect}
+SELECT
+  t.name AS team_name,
+  COUNT(e.id) AS num_employees
+FROM
+  teams AS t
+  LEFT JOIN employees AS e
+  ON t.id = e.team_id
+GROUP BY t.name
+ORDER BY num_employees DESC NULLS LAST
+```
+
+4. AcmeCorp management want to send an email survey to each of their employees. However, they are worried that some of the employees may not receive the email either because their email addresses may be invalid (in that they don’t contain an ‘@’ symbol), or they may not have a stored email address at all. Can you find all these employees?
+
+```{sql connection=db_connect}
+SELECT
+  id,
+  CONCAT(first_name, ' ', last_name) AS full_name,
+  email
+FROM employees
+WHERE email NOT LIKE '%@%' OR email IS NULL
+```
+
+** 2. EXTENSIONS **
+
+2.1 Harder SQL queries
+
+2.1.1 Which of the employees provided the most recent feedback? What was the date of this feedback?
+
+```{sql connection=db_connect}
+SELECT
+  CONCAT(e.first_name, ' ', e.last_name) AS full_name,
+  f.date
+FROM employees AS e
+INNER JOIN feedbacks AS f
+ON e.id = f.employee_id
+ORDER BY date DESC
+LIMIT 1
+```
+
+2.1.2 You are chatting with one of the AcmeCorp employees, and she mentions that one of the teams in the corporation has some employees whose first_name contains only their first initial, e.g. “D” instead of “Dionne”, “C” instead of “Charles” (they had a really formal administrator a few years back). Can you find the name of the team that she is most likely referring to (i.e. which team has the highest number of employees with single initial first_names)?
+
+```{sql connection=db_connect}
+SELECT
+  t.name AS team_name,
+  COUNT(t.name) AS count_of_single_char_first_name
+FROM
+  teams AS t
+  INNER JOIN employees AS e
+  ON t.id = e.team_id
+WHERE LENGTH(e.first_name) = 1
+GROUP BY t.name
+ORDER BY count_of_single_char_first_name DESC
+```
+2.2 Combining SQL and R coding - basic sentiment analysis
+
+2.2.1 AcmeCorp would like you to perform very basic ‘sentiment analysis’ of the stored employee feedbacks. They have provided a set of ‘positive’ and ‘negative’ words to use to score feedback messages in this analysis
+
+```{sql connection=db_connect}
+SELECT *
+FROM
+  teams AS t
+  INNER JOIN employees AS e
+  ON t.id = e.team_id
+INNER JOIN feedbacks AS f
+ON e.id = f.employee_id
+```
+
+```{r}
+positive_words <- c("great", "good", "happy", "content", "fulfilled", "fulfilled", "positive", "positives", "cheerful", "nice", "ambition", "ambitions", "ambitious", "friendly", "progress", "joy", "fast", "achieve", "achieving", "achievements", "best", "better",  "unlimited", "pros", "competitive", "opportunity", "advancement", "friendly", "smart", "interesting", "challenging", "grow", "caring", "balance", "helpful")
+
+negative_words <- c("worse", "worsening", "worst", "slow", "sluggish", "impatient", "unfulfilled", "unfulfilling", "negative", "bad", "limited", "limit", "limitations", "cons", "frustrated", "frustrating", "frustration", "dull", "boring", "politics", "political", "ignore", "ignored", "ignoring", "sad", "depressed", "depressing", "nasty", "stress", "stresses", "stressed", "horrid", "horrible", "terrible", "deadline", "deadlines", "uncaring", "remote")
+```
+
+```{r}
+score <- 0
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# dbDisconnect(db_connect)
+```
