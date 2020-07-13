@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Load tidyverse library
+
+```{r}
+library(tidyverse)
+```
+
+Question 1. Load in the dataset and have a look at it. What are the dimensions, variable types, variable names, etc.?
+
+```{r}
+dirty_data <- read_csv("data/starbucks_drinkMenu_expanded.csv")
+```
+
+```{r}
+glimpse(dirty_data)
+```
+
+Question 2. Let’s first investigate the calories of different drinks. Select the variables Beverage_category, Beverage, Beverage prep and Calories from your data. Since we are interested in the calorie content, check if there are any NA values in the data, and drop them if there are.
+
+```{r}
+calories <- select(dirty_data, Beverage_category, Beverage, Beverage_prep, Calories) %>%
+  filter(!is.na(Calories)) # filter out any values in Calories which are NA
+calories
+```
+
+Question 3. Create a new variable (column) called calorie_diff, which stores the difference between 135 calories (135 calories = 10 cubes of sugar!) and the calories in each drink. (hint: you’ll want to subtract the calories from 135 to see which drink have more or less than 10 cups of sugar).
+
+```{r}
+calorie_diff <- mutate(calories, calorie_diff = 135 - Calories)
+calorie_diff
+```
+
+Question 4. Summarise the mean number of calories in each beverage_category. Which 3 drinks have the most calories? Which 3 drinks have the least? Write a small summary of your findings.
+
+```{r}
+mean_cals <- select(calories, Beverage_category, Calories) %>%
+  group_by(Beverage_category) %>%
+  summarise(mean_calories = mean(Calories))
+
+mean_cals
+```
+
+Most calories - top 3
+
+```{r}
+most_calories <- arrange(mean_cals, desc(mean_calories)) %>%
+  head(3)
+most_calories
+```
+
+Least calories - bottom 3
+
+```{r}
+most_calories <- arrange(mean_cals, mean_calories) %>%
+  head(3)
+most_calories
+```
+
+Question 5. Let’s look at this a different way. What is the average number of calories in each Beverage_prep type?
+
+```{r}
+mean_cals_bev_prep <- select(calories, Beverage_prep, Calories) %>%
+  group_by(Beverage_prep) %>%
+  summarise(mean_calories = mean(Calories))
+
+mean_cals_bev_prep
+```
